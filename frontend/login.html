@@ -1,139 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login Page</title>
-<style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #e0f7fa, #bbdefb);
-    color: #333;
-}
-
-header {
-    background: linear-gradient(90deg, #1976d2, #42a5f5);
-    color: white;
-    padding: 10px;
-    text-align: center;
-}
-
-main {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 80vh;
-}
-
-.login-container {
-    background: linear-gradient(135deg, #ffffff, #e3f2fd);
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
-    width: 300px;
-    text-align: center;
-}
-
-.login-container h2 {
-    color: #1976d2;
-    margin-bottom: 20px;
-}
-
-.toggle-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-.toggle-buttons button {
-    width: 48%;
-    padding: 8px;
-    border: none;
-    border-radius: 5px;
-    background: #42a5f5;
-    color: white;
-    cursor: pointer;
-}
-
-.toggle-buttons button.active {
-    background: #1976d2;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-}
-
-label {
-    margin-top: 10px;
-}
-
-input {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-button[type="submit"] {
-    width: 100%;
-    padding: 10px;
-    margin-top: 20px;
-    background: linear-gradient(90deg, #1976d2, #42a5f5);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-button[type="submit"]:hover {
-    opacity: 0.9;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicEye Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      width: 350px;
+      text-align: center;
+    }
+    .login-container h2 {
+      color: #2c552c;
+      margin-bottom: 1rem;
+    }
+    .login-container img {
+      width: 60px;
+      margin-bottom: 1rem;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    label {
+      display: block;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      color: white;
+      background-color: #2e7d32;
+      margin-top: 10px;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
+  <div class="login-container">
+    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Login Icon">
+    <h2>CivicEye Login</h2>
+    <p>Login using your username and password</p>
+    
+    <!-- Login Form -->
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Enter Username" required>
+      <input type="password" id="password" placeholder="Enter Password" required minlength="6">
+      
+      <!-- ✅ NGO Login Option -->
+      <label>
+        <input type="checkbox" id="ngoLogin"> NGO Login
+      </label>
 
-<header>
-    <h1>Welcome</h1>
-</header>
+      <button type="submit">Login</button>
+    </form>
+    
+    <!-- Error Message -->
+    <p id="errorMsg" class="error"></p>
+  </div>
 
-<main>
-    <div class="login-container">
-        <h2 id="login-title">User Login</h2>
-        <div class="toggle-buttons">
-            <button class="active" onclick="showUser()">User</button>
-            <button onclick="showNGO()">NGO</button>
-        </div>
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      event.preventDefault(); // stop form refresh
 
-        <form id="login-form">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required>
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const isNgo = document.getElementById("ngoLogin").checked;
 
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
+      // ✅ Conditions
+      if (username === "") {
+        document.getElementById("errorMsg").innerText = "Username cannot be empty!";
+        return;
+      }
+      if (password.length < 6) {
+        document.getElementById("errorMsg").innerText = "Password must be at least 6 characters!";
+        return;
+      }
 
-            <button type="submit">Login</button>
-        </form>
-    </div>
-</main>
+      // If valid → redirect or call backend
+      if (isNgo) {
+        alert("NGO Login successful for: " + username);
+      } else {
+        alert("User Login successful for: " + username);
+      }
 
-<script>
-function showUser() {
-    document.getElementById('login-title').innerText = 'User Login';
-    document.querySelector('.toggle-buttons button:first-child').classList.add('active');
-    document.querySelector('.toggle-buttons button:last-child').classList.remove('active');
-}
-
-function showNGO() {
-    document.getElementById('login-title').innerText = 'NGO Login';
-    document.querySelector('.toggle-buttons button:last-child').classList.add('active');
-    document.querySelector('.toggle-buttons button:first-child').classList.remove('active');
-}
-</script>
-
+      // Example redirect after login
+      // window.location.href = "index.html"; 
+    });
+  </script>
 </body>
 </html>
