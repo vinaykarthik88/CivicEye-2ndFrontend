@@ -5,18 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CivicEye - Home</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body id="index">
     <header>
-        <h1>CivicEye</h1>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="report.html">Report Hazard</a>
-            <a href="view.html">View Hazards</a>
-            <a href="validate.html">Validate Hazards</a>
-            <a href="leaderboard.html">Leaderboard</a>
-            <a href="login.html">Login</a>
-        </nav>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-eye"></i>
+                <span>CivicEye</span>
+            </div>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav id="main-nav">
+                <a href="index.html" class="active">Home</a>
+                <a href="about.html">About</a>
+                <a href="report.html">Report Hazard</a>
+                <a href="view.html">View Hazards</a>
+                <a href="validate.html">Validate Hazards</a>
+                <a href="leaderboard.html">Leaderboard</a>
+                <a href="login.html">Login</a>
+            </nav>
+        </div>
     </header>
     <main>
         <section class="hero">
@@ -32,7 +42,16 @@
         </section>
     </main>
     <footer>
-        <p>Thank you! Contact us for more info.</p>
+        <div class="footer-content">
+            <p>Thank you! Contact us for more info.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+            <p>&copy; 2023 CivicEye. All rights reserved.</p>
+        </div>
     </footer>
     <script src="script.js"></script>
 </body>

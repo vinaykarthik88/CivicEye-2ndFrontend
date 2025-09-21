@@ -5,55 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CivicEye - Leaderboard</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body id="leaderboard">
     <header>
-        <h1>CivicEye</h1>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="report.html">Report Hazard</a>
-            <a href="view.html">View Hazards</a>
-            <a href="validate.html">Validate Hazards</a>
-            <a href="leaderboard.html" class="active">Leaderboard</a>
-            <a href="login.html">Login</a>
-        </nav>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-eye"></i>
+                <span>CivicEye</span>
+            </div>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav id="main-nav">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="report.html">Report Hazard</a>
+                <a href="view.html">View Hazards</a>
+                <a href="validate.html">Validate Hazards</a>
+                <a href="leaderboard.html" class="active">Leaderboard</a>
+                <a href="login.html">Login</a>
+            </nav>
+        </div>
     </header>
-
     <main>
-        <section class="leaderboard-section">
-            <h2>Leaderboard</h2>
-            <p>Users and NGOs ranked by points. Level up every 10 points!</p>
-            
+        <section>
+            <h2>Community Leaderboard</h2>
             <div class="table-wrapper">
                 <table id="leaderboardTable">
                     <thead>
                         <tr>
-                            <th>Rank</th>
-                            <th>User <span class="sort-arrow" onclick="sortTable('user')">↑↓</span></th>
-                            <th>Points <span class="sort-arrow" onclick="sortTable('points')">↑↓</span></th>
-                            <th>Level</th>
+                            <th onclick="sortTable('rank')">Rank <span class="sort-arrow">↕</span></th>
+                            <th onclick="sortTable('user')">User <span class="sort-arrow">↕</span></th>
+                            <th onclick="sortTable('points')">Points <span class="sort-arrow">↕</span></th>
+                            <th onclick="sortTable('level')">Level <span class="sort-arrow">↕</span></th>
                         </tr>
                     </thead>
                     <tbody id="leaderboardBody"></tbody>
                 </table>
             </div>
-
             <div id="pagination">
-                <button onclick="prevPage()">← Previous</button>
-                <span id="pageInfo">Page 1</span>
-                <button onclick="nextPage()">Next →</button>
+                <button onclick="prevPage()">Previous</button>
+                <span id="pageInfo">Page 1 of 1</span>
+                <button onclick="nextPage()">Next</button>
             </div>
         </section>
     </main>
-
     <footer>
-        <p>Thank you for contributing! Contact us for more info.</p>
+        <div class="footer-content">
+            <p>Thank you! Contact us for more info.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+            <p>&copy; 2023 CivicEye. All rights reserved.</p>
+        </div>
     </footer>
-
     <script src="script.js"></script>
     <script>
-        loadLeaderboard();
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLeaderboard();
+        });
     </script>
 </body>
 </html>

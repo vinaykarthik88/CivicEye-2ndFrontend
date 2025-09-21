@@ -1,29 +1,20 @@
 let currentPage = 1;
 const rowsPerPage = 10;
 let leaderboardData = [];
-let sortColumn = 'points';
-let sortDirection = -1; // -1 for desc, 1 for asc
+let sortKey = 'points';
+let sortAsc = false;
 
-// Urgency map based on provided values
 const urgencyMap = {
-    "Physical Hazard": 5,
-    "Biological Hazard": 4,
-    "Chemical Hazard": 4,
-    "Ergonomic Hazard": 3,
-    "Electrical Hazard": 4,
-    "Safety Hazard": 4,
-    "Earthquake": 3,
-    "Flood": 3,
-    "Extreme Weather": 3,
-    "Sinkhole": 2,
-    "Others": 2
+    "Physical Hazard": 5, "Biological Hazard": 4, "Chemical Hazard": 4,
+    "Ergonomic Hazard": 3, "Electrical Hazard": 4, "Safety Hazard": 4,
+    "Earthquake": 3, "Flood": 3, "Extreme Weather": 3, "Sinkhole": 2, "Others": 2
 };
 
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
-            document.getElementById('lat').value = position.coords.latitude;
-            document.getElementById('lng').value = position.coords.longitude;
+            document.getElementById('lat').value = position.coords.latitude.toFixed(6);
+            document.getElementById('lng').value = position.coords.longitude.toFixed(6);
         }, (error) => {
             alert('Error getting location: ' + error.message);
         });
@@ -33,7 +24,7 @@ function getLocation() {
 }
 
 function validateDarpanId(id) {
-    return /^[a-zA-Z0-9]{6,}$/.test(id); // Simple alphanumeric check, min 6 chars
+    return /^[a-zA-Z0-9]{6,}$/.test(id);
 }
 
 function getDarpanUser(isNgo) {
@@ -67,16 +58,15 @@ function saveCurrentUser(userId) {
     localStorage.setItem('currentUser', userId);
 }
 
-function loadDarpanForForm(formType) {
+function loadDarpanForForm() {
     const currentUser = getCurrentUser();
     if (currentUser) {
         const section = document.getElementById('darpanSection');
         const input = document.getElementById('darpanId');
-        section.style.display = 'block';
-        input.value = currentUser;
-    } else {
-        alert('Please login with your Darpan ID or Gmail first.');
-        window.location.href = 'login.html';
+        if (section && input) {
+            section.style.display = 'block';
+            input.value = currentUser;
+        }
     }
 }
 
@@ -96,30 +86,67 @@ function login(event) {
     const isNgo = document.getElementById('isNgo').checked;
 
     if (!validateDarpanId(darpanId)) {
-        document.getElementById('loginStatus').textContent = 'Invalid Darpan ID: Must be alphanumeric and at least 6 characters.';
+        showStatus('Invalid Darpan ID: Must be alphanumeric and at least 6 characters.', 'error');
         return;
     }
 
     const userId = getDarpanUser(isNgo);
     initUser(userId);
     saveCurrentUser(userId);
-    document.getElementById('loginStatus').textContent = 'Login successful! Redirecting...';
+    showStatus('Login successful! Redirecting...', 'success');
+    setTimeout(() => window.location.href = 'index.html', 1000);
+}
+
+function loginWithGmail() {
+    const gmailId = document.getElementById('gmailId').value.trim();
+    if (!gmailId || !gmailId.includes('@gmail.com')) {
+        showStatus('Please enter a valid Gmail address.', 'error');
+        return;
+    }
+
+    const userId = 'GMAIL_' + gmailId.replace('@gmail.com', '');
+    initUser(userId);
+    saveCurrentUser(userId);
+    showStatus('Login with Gmail successful! Redirecting...', 'success');
     setTimeout(() => window.location.href = 'index.html', 1000);
 }
 
 function logout() {
     localStorage.removeItem('currentUser');
-    document.getElementById('loginStatus').textContent = 'Logged out successfully!';
+    showStatus('Logged out successfully!', 'success');
     document.getElementById('loginForm').reset();
     document.getElementById('isNgo').checked = false;
+    document.getElementById('userInfo').style.display = 'none';
+}
+
+function showStatus(message, type) {
+    const statusDiv = document.createElement('div');
+    statusDiv.className = `login-status ${type}`;
+    statusDiv.textContent = message;
+    
+    document.querySelector('.login-box:first-child').appendChild(statusDiv);
+    
+    setTimeout(() => {
+        statusDiv.remove();
+    }, 5000);
+}
+
+function checkLoggedIn() {
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+        document.getElementById('currentUserDisplay').textContent = currentUser;
+        document.getElementById('userInfo').style.display = 'block';
+    } else {
+        document.getElementById('userInfo').style.display = 'none';
+    }
 }
 
 function submitReport(event) {
     event.preventDefault();
     const userId = getCurrentUser();
     if (!userId) {
-        alert('Please login with your Darpan ID or Gmail first.');
-        window.location.href = 'login.html';
+        showStatus('Please log in to submit a report.', 'error');
+        setTimeout(() => { window.location.href = 'login.html'; }, 2000);
         return;
     }
 
@@ -130,105 +157,93 @@ function submitReport(event) {
     const imageFile = document.getElementById('image').files[0];
 
     if (!description || !type || !lat || !lng) {
-        alert('Please fill all fields.');
+        showStatus('Please fill all required fields.', 'error');
         return;
     }
 
     if (description.length < 10) {
-        alert('Description too short (mock spam filter).');
+        showStatus('Description must be at least 10 characters long.', 'error');
         return;
     }
 
-    initUser(userId);
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const imageBase64 = e.target.result;
-        const hazard = {
-            id: Date.now(),
-            reporter: userId,
-            description,
-            type,
-            lat: parseFloat(lat),
-            lng: parseFloat(lng),
-            image: imageBase64,
-            status: 'pending',
-            validation_status: 'pending',
-            votes: { true: 0, false: 0 },
-            resolvedBy: null,
-            solutions: [],
-            validatedBy: {}
-        };
-
-        let hazards = JSON.parse(localStorage.getItem('hazards')) || [];
-        hazards.push(hazard);
-        localStorage.setItem('hazards', JSON.stringify(hazards));
-
-        document.getElementById('status').textContent = 'Report submitted! It will appear in Validate Hazards for review.';
-        document.getElementById('reportForm').reset();
+    const hazard = {
+        id: Date.now(),
+        reporter: userId,
+        description,
+        type,
+        lat: parseFloat(lat),
+        lng: parseFloat(lng),
+        image: null,
+        status: 'pending',
+        validation_status: 'pending',
+        votes: { true: 0, false: 0 },
+        resolvedBy: null,
+        solutions: [],
+        validatedBy: {}
     };
 
     if (imageFile) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            hazard.image = e.target.result;
+            saveHazard(hazard);
+        };
         reader.readAsDataURL(imageFile);
     } else {
-        const hazard = {
-            id: Date.now(),
-            reporter: userId,
-            description,
-            type,
-            lat: parseFloat(lat),
-            lng: parseFloat(lng),
-            image: null,
-            status: 'pending',
-            validation_status: 'pending',
-            votes: { true: 0, false: 0 },
-            resolvedBy: null,
-            solutions: [],
-            validatedBy: {}
-        };
-        let hazards = JSON.parse(localStorage.getItem('hazards')) || [];
-        hazards.push(hazard);
-        localStorage.setItem('hazards', JSON.stringify(hazards));
-        document.getElementById('status').textContent = 'Report submitted! It will appear in Validate Hazards for review.';
-        document.getElementById('reportForm').reset();
+        saveHazard(hazard);
     }
+}
+
+function saveHazard(hazard) {
+    let hazards = JSON.parse(localStorage.getItem('hazards')) || [];
+    hazards.push(hazard);
+    localStorage.setItem('hazards', JSON.stringify(hazards));
+    
+    showStatus('Report submitted successfully! It will appear in Validate Hazards for review.', 'success');
+    document.getElementById('reportForm').reset();
 }
 
 function loadValidatedHazards() {
     const hazards = JSON.parse(localStorage.getItem('hazards')) || [];
     const filtered = hazards.filter(h => h.validation_status === 'valid')
-        .sort((a, b) => urgencyMap[b.type] - urgencyMap[a.type] || b.id - a.id); // Sort by urgency, then by ID
+        .sort((a, b) => urgencyMap[b.type] - urgencyMap[a.type] || b.id - a.id);
     const list = document.getElementById('hazardList');
+    if (!list) return;
+    
     list.innerHTML = '';
 
-    const map = L.map('map').setView([0, 0], 2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    if (typeof L !== 'undefined') {
+        const map = L.map('map').setView([20.5937, 78.9629], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
 
-    filtered.forEach(hazard => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <strong>Type: ${hazard.type} (Urgency: ${urgencyMap[hazard.type]})</strong><br>
-            Description: ${hazard.description}<br>
-            Reporter: ${hazard.reporter}<br>
-            Location: (${hazard.lat}, ${hazard.lng})<br>
-            Status: ${hazard.status} ${hazard.resolvedBy ? `(Resolved by: ${hazard.resolvedBy})` : ''}<br>
-            ${hazard.image ? `<img src="${hazard.image}" alt="Hazard Image" style="max-width: 200px;">` : ''}<br>
-            ${hazard.solutions.length ? `Solutions: <ul>${hazard.solutions.map(s => `<li>${s.validator}: ${s.solution}</li>`).join('')}</ul>` : 'No solutions yet.'}
-            <button onclick="updateStatus(${hazard.id}, 'resolved')">Mark Resolved</button>
-        `;
-        list.appendChild(li);
+        filtered.forEach(hazard => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <strong>Type: ${hazard.type} (Urgency: ${urgencyMap[hazard.type]})</strong><br>
+                Description: ${hazard.description}<br>
+                Reporter: ${hazard.reporter}<br>
+                Location: (${hazard.lat}, ${hazard.lng})<br>
+                Status: ${hazard.status} ${hazard.resolvedBy ? `(Resolved by: ${hazard.resolvedBy})` : ''}<br>
+                ${hazard.image ? `<img src="${hazard.image}" alt="Hazard Image" style="max-width: 200px;">` : ''}<br>
+                ${hazard.solutions.length ? `Solutions: <ul>${hazard.solutions.map(s => `<li>${s.validator}: ${s.solution}</li>`).join('')}</ul>` : 'No solutions yet.'}
+                <button onclick="updateStatus(${hazard.id}, 'resolved')">Mark Resolved</button>
+            `;
+            list.appendChild(li);
 
-        L.marker([hazard.lat, hazard.lng]).addTo(map)
-            .bindPopup(`${hazard.type}: ${hazard.description}`);
-    });
+            L.marker([hazard.lat, hazard.lng]).addTo(map)
+                .bindPopup(`${hazard.type}: ${hazard.description}`);
+        });
+    }
 }
 
 function loadPendingHazards() {
     const hazards = JSON.parse(localStorage.getItem('hazards')) || [];
     const filtered = hazards.filter(h => h.validation_status === 'pending');
     const list = document.getElementById('pendingList');
+    if (!list) return;
+    
     list.innerHTML = '';
 
     filtered.forEach(hazard => {
@@ -285,7 +300,6 @@ function vote(id, isValid) {
     localStorage.setItem('hazards', JSON.stringify(hazards));
 
     updateUserPoints(userId, 1);
-
     loadPendingHazards();
 }
 
@@ -313,9 +327,6 @@ function updateStatus(id, newStatus) {
     loadValidatedHazards();
 }
 
-let sortKey = 'points';
-let sortAsc = false;
-
 function loadLeaderboard() {
     const users = JSON.parse(localStorage.getItem('users')) || {};
     leaderboardData = Object.entries(users).map(([userId, { points, level }]) => ({ user: userId, points, level }));
@@ -342,6 +353,8 @@ function displayPage(page) {
     const end = start + rowsPerPage;
     const pageData = leaderboardData.slice(start, end);
     const body = document.getElementById('leaderboardBody');
+    if (!body) return;
+    
     body.innerHTML = '';
     pageData.forEach((entry, index) => {
         const rank = start + index + 1;
@@ -389,21 +402,6 @@ function nextPage() {
     }
 }
 
-function loginWithGmail() {
-    // This is a mock implementation since we can't perform real OAuth here
-    const gmailId = prompt('Enter your Gmail ID (e.g., user@gmail.com):');
-    if (gmailId && gmailId.includes('@gmail.com')) {
-        const userId = `GMAIL_${gmailId.replace('@gmail.com', '')}`;
-        initUser(userId);
-        saveCurrentUser(userId);
-        document.getElementById('loginStatus').textContent = 'Login with Gmail successful! Redirecting...';
-        setTimeout(() => window.location.href = 'index.html', 1000);
-    } else {
-        document.getElementById('loginStatus').textContent = 'Invalid Gmail ID. Please use a valid Gmail address.';
-    }
-}
-
-// Mobile menu functionality
 document.addEventListener('DOMContentLoaded', function() {
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const mainNav = document.getElementById('main-nav');
@@ -414,7 +412,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Set active navigation link based on current page
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     const navLinks = document.querySelectorAll('nav a');
     
@@ -424,4 +421,7 @@ document.addEventListener('DOMContentLoaded', function() {
             link.classList.add('active');
         }
     });
+    
+    checkLoggedIn();
+    loadDarpanForForm();
 });
