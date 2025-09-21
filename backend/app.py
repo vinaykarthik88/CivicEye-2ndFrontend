@@ -88,7 +88,6 @@ def get_user():
         return jsonify(user)
     return jsonify({'error': 'Not logged in'}), 401
 
-if __name__ == '__main__':
 @app.route('/api/report', methods=['POST'])
 def submit_report():
     data = request.get_json()
@@ -104,45 +103,31 @@ def submit_report():
     c = conn.cursor()
     c.execute('''INSERT INTO reports (reporter, type, description, lat, lng, image) VALUES (?, ?, ?, ?, ?, ?)''',
               (reporter, hazard_type, description, lat, lng, image))
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True})
 
-    # --- Hazard Report Endpoints ---
-    @app.route('/api/report', methods=['POST'])
-    def submit_report():
-        data = request.get_json()
-        reporter = data.get('reporter')
-        hazard_type = data.get('type')
-        description = data.get('description')
-        lat = data.get('lat')
-        lng = data.get('lng')
-        image = data.get('image')  # base64 string or URL
-        if not (reporter and hazard_type and description and lat and lng):
-            return jsonify({'error': 'Missing required fields'}), 400
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute('''INSERT INTO reports (reporter, type, description, lat, lng, image) VALUES (?, ?, ?, ?, ?, ?)''',
-                  (reporter, hazard_type, description, lat, lng, image))
-        conn.commit()
-        conn.close()
-        return jsonify({'success': True})
+@app.route('/api/reports', methods=['GET'])
+def get_reports():
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute('SELECT id, reporter, type, description, lat, lng, image, created_at FROM reports ORDER BY created_at DESC')
+    rows = c.fetchall()
+    conn.close()
+    reports = [
+        {
+            'id': row[0],
+            'reporter': row[1],
+            'type': row[2],
+            'description': row[3],
+            'lat': row[4],
+            'lng': row[5],
+            'image': row[6],
+            'created_at': row[7]
+        }
+        for row in rows
+    ]
+    return jsonify(reports)
 
-    @app.route('/api/reports', methods=['GET'])
-    def get_reports():
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute('SELECT id, reporter, type, description, lat, lng, image, created_at FROM reports ORDER BY created_at DESC')
-        rows = c.fetchall()
-        conn.close()
-        reports = [
-            {
-                'id': row[0],
-                'reporter': row[1],
-                'type': row[2],
-                'description': row[3],
-                'lat': row[4],
-                'lng': row[5],
-                'image': row[6],
-                'created_at': row[7]
-            }
-            for row in rows
-        ]
-        return jsonify(reports)
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
