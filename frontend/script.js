@@ -4,6 +4,21 @@ let leaderboardData = [];
 let sortColumn = 'points';
 let sortDirection = -1; // -1 for desc, 1 for asc
 
+// Urgency map based on provided values
+const urgencyMap = {
+    "Physical Hazard": 5,
+    "Biological Hazard": 4,
+    "Chemical Hazard": 4,
+    "Ergonomic Hazard": 3,
+    "Electrical Hazard": 4,
+    "Safety Hazard": 4,
+    "Earthquake": 3,
+    "Flood": 3,
+    "Extreme Weather": 3,
+    "Sinkhole": 2,
+    "Others": 2
+};
+
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
@@ -26,20 +41,20 @@ function getDarpanUser(isNgo) {
     return isNgo ? 'NGO_' + darpanId : darpanId;
 }
 
-function initUser(darpanId) {
+function initUser(userId) {
     let users = JSON.parse(localStorage.getItem('users')) || {};
-    if (!users[darpanId]) {
-        users[darpanId] = { points: 0, level: 1 };
+    if (!users[userId]) {
+        users[userId] = { points: 0, level: 1 };
         localStorage.setItem('users', JSON.stringify(users));
     }
     return users;
 }
 
-function updateUserPoints(darpanId, addPoints) {
+function updateUserPoints(userId, addPoints) {
     let users = JSON.parse(localStorage.getItem('users')) || {};
-    if (users[darpanId]) {
-        users[darpanId].points += addPoints;
-        users[darpanId].level = Math.floor(users[darpanId].points / 10) + 1;
+    if (users[userId]) {
+        users[userId].points += addPoints;
+        users[userId].level = Math.floor(users[userId].points / 10) + 1;
         localStorage.setItem('users', JSON.stringify(users));
     }
 }
@@ -48,8 +63,8 @@ function getCurrentUser() {
     return localStorage.getItem('currentUser');
 }
 
-function saveCurrentUser(darpanId) {
-    localStorage.setItem('currentUser', darpanId);
+function saveCurrentUser(userId) {
+    localStorage.setItem('currentUser', userId);
 }
 
 function loadDarpanForForm(formType) {
@@ -60,7 +75,7 @@ function loadDarpanForForm(formType) {
         section.style.display = 'block';
         input.value = currentUser;
     } else {
-        alert('Please login with your Darpan ID first.');
+        alert('Please login with your Darpan ID or Gmail first.');
         window.location.href = 'login.html';
     }
 }
@@ -101,9 +116,9 @@ function logout() {
 
 function submitReport(event) {
     event.preventDefault();
-    const darpanId = getCurrentUser();
-    if (!darpanId) {
-        alert('Please login with your Darpan ID first.');
+    const userId = getCurrentUser();
+    if (!userId) {
+        alert('Please login with your Darpan ID or Gmail first.');
         window.location.href = 'login.html';
         return;
     }
@@ -124,14 +139,14 @@ function submitReport(event) {
         return;
     }
 
-    initUser(darpanId);
+    initUser(userId);
 
     const reader = new FileReader();
     reader.onload = function(e) {
         const imageBase64 = e.target.result;
         const hazard = {
             id: Date.now(),
-            reporter: darpanId,
+            reporter: userId,
             description,
             type,
             lat: parseFloat(lat),
@@ -158,7 +173,7 @@ function submitReport(event) {
     } else {
         const hazard = {
             id: Date.now(),
-            reporter: darpanId,
+            reporter: userId,
             description,
             type,
             lat: parseFloat(lat),
@@ -181,9 +196,8 @@ function submitReport(event) {
 
 function loadValidatedHazards() {
     const hazards = JSON.parse(localStorage.getItem('hazards')) || [];
-    const urgencyMap = { air: 3, water: 2, waste: 1 };
     const filtered = hazards.filter(h => h.validation_status === 'valid')
-        .sort((a, b) => urgencyMap[b.type] - urgencyMap[a.type]);
+        .sort((a, b) => urgencyMap[b.type] - urgencyMap[a.type] || b.id - a.id); // Sort by urgency, then by ID
     const list = document.getElementById('hazardList');
     list.innerHTML = '';
 
@@ -220,7 +234,7 @@ function loadPendingHazards() {
     filtered.forEach(hazard => {
         const li = document.createElement('li');
         li.innerHTML = `
-            <strong>Type: ${hazard.type}</strong><br>
+            <strong>Type: ${hazard.type} (Urgency: ${urgencyMap[hazard.type]})</strong><br>
             Description: ${hazard.description}<br>
             Reporter: ${hazard.reporter}<br>
             Location: (${hazard.lat}, ${hazard.lng})<br>
@@ -236,27 +250,27 @@ function loadPendingHazards() {
 }
 
 function vote(id, isValid) {
-    const darpanId = getCurrentUser();
-    if (!darpanId) {
-        alert('Please login with your Darpan ID first.');
+    const userId = getCurrentUser();
+    if (!userId) {
+        alert('Please login with your Darpan ID or Gmail first.');
         window.location.href = 'login.html';
         return;
     }
 
-    initUser(darpanId);
+    initUser(userId);
 
     let hazards = JSON.parse(localStorage.getItem('hazards')) || [];
     hazards = hazards.map(h => {
         if (h.id === id) {
-            if (h.validatedBy[darpanId]) {
+            if (h.validatedBy[userId]) {
                 alert('You have already voted on this hazard.');
                 return h;
             }
             h.votes[isValid ? 'true' : 'false']++;
-            h.validatedBy[darpanId] = true;
+            h.validatedBy[userId] = true;
             const solution = document.getElementById(`solution_${id}`).value.trim();
             if (isValid && solution) {
-                h.solutions.push({ validator: darpanId, solution });
+                h.solutions.push({ validator: userId, solution });
             }
             if (h.votes.true >= 3) {
                 h.validation_status = 'valid';
@@ -270,7 +284,7 @@ function vote(id, isValid) {
     });
     localStorage.setItem('hazards', JSON.stringify(hazards));
 
-    updateUserPoints(darpanId, 1);
+    updateUserPoints(userId, 1);
 
     loadPendingHazards();
 }
@@ -278,7 +292,7 @@ function vote(id, isValid) {
 function updateStatus(id, newStatus) {
     const currentUser = getCurrentUser();
     if (!currentUser) {
-        alert('Please login with your Darpan ID first.');
+        alert('Please login with your Darpan ID or Gmail first.');
         window.location.href = 'login.html';
         return;
     }
@@ -304,7 +318,7 @@ let sortAsc = false;
 
 function loadLeaderboard() {
     const users = JSON.parse(localStorage.getItem('users')) || {};
-    leaderboardData = Object.entries(users).map(([darpanId, { points, level }]) => ({ user: darpanId, points, level }));
+    leaderboardData = Object.entries(users).map(([userId, { points, level }]) => ({ user: userId, points, level }));
     sortLeaderboard();
     displayPage(currentPage);
 }
@@ -374,3 +388,17 @@ function nextPage() {
         displayPage(currentPage);
     }
 }
+
+function loginWithGmail() {
+    // This is a mock implementation since we can't perform real OAuth here
+    const gmailId = prompt('Enter your Gmail ID (e.g., user@gmail.com):');
+    if (gmailId && gmailId.includes('@gmail.com')) {
+        const userId = `GMAIL_${gmailId.replace('@gmail.com', '')}`;
+        initUser(userId);
+        saveCurrentUser(userId);
+        document.getElementById('loginStatus').textContent = 'Login with Gmail successful! Redirecting...';
+        setTimeout(() => window.location.href = 'index.html', 1000);
+    } else {
+        document.getElementById('loginStatus').textContent = 'Invalid Gmail ID. Please use a valid Gmail address.';
+    }
+}   
