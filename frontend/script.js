@@ -166,32 +166,52 @@ function submitReport(event) {
         return;
     }
 
-    const hazard = {
-        id: Date.now(),
-        reporter: userId,
-        description,
-        type,
-        lat: parseFloat(lat),
-        lng: parseFloat(lng),
-        image: null,
-        status: 'pending',
-        validation_status: 'pending',
-        votes: { true: 0, false: 0 },
-        resolvedBy: null,
-        solutions: [],
-        validatedBy: {}
-    };
-
+    // Handle image upload (convert to base64 if present)
     if (imageFile) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            hazard.image = e.target.result;
-            saveHazard(hazard);
+            sendReportToBackend({
+                reporter: userId,
+                description,
+                type,
+                lat: parseFloat(lat),
+                lng: parseFloat(lng),
+                image: e.target.result
+            });
         };
         reader.readAsDataURL(imageFile);
     } else {
-        saveHazard(hazard);
+        sendReportToBackend({
+            reporter: userId,
+            description,
+            type,
+            lat: parseFloat(lat),
+            lng: parseFloat(lng),
+            image: null
+        });
     }
+}
+
+function sendReportToBackend(hazard) {
+    fetch('http://localhost:5000/api/report', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(hazard)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showStatus('Report submitted successfully! It will appear for all users.', 'success');
+            document.getElementById('reportForm').reset();
+        } else {
+            showStatus('Error submitting report: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(() => {
+        showStatus('Network error submitting report.', 'error');
+    });
 }
 
 function saveHazard(hazard) {
@@ -204,38 +224,40 @@ function saveHazard(hazard) {
 }
 
 function loadValidatedHazards() {
-    const hazards = JSON.parse(localStorage.getItem('hazards')) || [];
-    const filtered = hazards.filter(h => h.validation_status === 'valid')
-        .sort((a, b) => urgencyMap[b.type] - urgencyMap[a.type] || b.id - a.id);
-    const list = document.getElementById('hazardList');
-    if (!list) return;
-    
-    list.innerHTML = '';
+    fetch('http://localhost:5000/api/reports')
+        .then(response => response.json())
+        .then(hazards => {
+            // Optionally filter for validated hazards if you add validation to backend
+            // For now, show all
+            const list = document.getElementById('hazardList');
+            if (!list) return;
+            list.innerHTML = '';
 
-    if (typeof L !== 'undefined') {
-        const map = L.map('map').setView([20.5937, 78.9629], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+            if (typeof L !== 'undefined') {
+                const map = L.map('map').setView([20.5937, 78.9629], 5);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
 
-        filtered.forEach(hazard => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <strong>Type: ${hazard.type} (Urgency: ${urgencyMap[hazard.type]})</strong><br>
-                Description: ${hazard.description}<br>
-                Reporter: ${hazard.reporter}<br>
-                Location: (${hazard.lat}, ${hazard.lng})<br>
-                Status: ${hazard.status} ${hazard.resolvedBy ? `(Resolved by: ${hazard.resolvedBy})` : ''}<br>
-                ${hazard.image ? `<img src="${hazard.image}" alt="Hazard Image" style="max-width: 200px;">` : ''}<br>
-                ${hazard.solutions.length ? `Solutions: <ul>${hazard.solutions.map(s => `<li>${s.validator}: ${s.solution}</li>`).join('')}</ul>` : 'No solutions yet.'}
-                <button onclick="updateStatus(${hazard.id}, 'resolved')">Mark Resolved</button>
-            `;
-            list.appendChild(li);
-
-            L.marker([hazard.lat, hazard.lng]).addTo(map)
-                .bindPopup(`${hazard.type}: ${hazard.description}`);
+                hazards.forEach(hazard => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <strong>Type: ${hazard.type} (Urgency: ${urgencyMap[hazard.type]})</strong><br>
+                        Description: ${hazard.description}<br>
+                        Reporter: ${hazard.reporter}<br>
+                        Location: (${hazard.lat}, ${hazard.lng})<br>
+                        ${hazard.image ? `<img src="${hazard.image}" alt="Hazard Image" style="max-width: 200px;">` : ''}<br>
+                        <span>Reported at: ${hazard.created_at}</span>
+                    `;
+                    list.appendChild(li);
+                    L.marker([hazard.lat, hazard.lng]).addTo(map)
+                        .bindPopup(`${hazard.type}: ${hazard.description}`);
+                });
+            }
+        })
+        .catch(() => {
+            showStatus('Error loading hazards from server.', 'error');
         });
-    }
 }
 
 function loadPendingHazards() {
