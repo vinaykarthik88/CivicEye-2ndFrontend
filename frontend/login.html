@@ -293,6 +293,15 @@
             background-color: #c03d2e;
         }
 
+        .logout-btn {
+            background-color: var(--danger);
+            margin-top: 1rem;
+        }
+
+        .logout-btn:hover {
+            background-color: #c1121f;
+        }
+
         .divider {
             display: flex;
             align-items: center;
@@ -329,6 +338,16 @@
             background-color: #f8d7da;
             color: #842029;
             border: 1px solid #f5c2c7;
+        }
+
+        .user-info {
+            background-color: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            text-align: center;
         }
 
         /* Footer */
@@ -497,6 +516,14 @@
         </div>
     </main>
 
+    <div class="user-info" id="userInfo" style="display: none;">
+        <p>Currently logged in as: <span id="currentUserDisplay"></span></p>
+        <button class="logout-btn" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </button>
+    </div>
+
     <footer>
         <div class="footer-content">
             <p>Thank you! Contact us for more info.</p>
@@ -511,6 +538,17 @@
     </footer>
 
     <script>
+        // Check if user is already logged in
+        function checkLoggedIn() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                document.getElementById('currentUserDisplay').textContent = currentUser;
+                document.getElementById('userInfo').style.display = 'block';
+            } else {
+                document.getElementById('userInfo').style.display = 'none';
+            }
+        }
+
         // Mobile menu toggle
         document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
             document.getElementById('main-nav').classList.toggle('active');
@@ -538,8 +576,22 @@
                 return;
             }
             
-            // Simulate successful login
+            // Save user to localStorage
+            const userId = isNgo ? 'NGO_' + darpanId : darpanId;
+            localStorage.setItem('currentUser', userId);
+            
+            // Initialize user data if it doesn't exist
+            let users = JSON.parse(localStorage.getItem('users')) || {};
+            if (!users[userId]) {
+                users[userId] = { points: 0, level: 1 };
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+            
+            // Show success message
             showStatus('Login successful! Redirecting...', 'success');
+            
+            // Update UI
+            checkLoggedIn();
             
             // In a real application, you would handle the login process here
             setTimeout(() => {
@@ -558,14 +610,40 @@
                 return;
             }
             
-            // Simulate successful login
+            // Save user to localStorage
+            const userId = 'GMAIL_' + gmailId.replace('@gmail.com', '');
+            localStorage.setItem('currentUser', userId);
+            
+            // Initialize user data if it doesn't exist
+            let users = JSON.parse(localStorage.getItem('users')) || {};
+            if (!users[userId]) {
+                users[userId] = { points: 0, level: 1 };
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+            
+            // Show success message
             showStatus('Login with Gmail successful! Redirecting...', 'success');
+            
+            // Update UI
+            checkLoggedIn();
             
             // In a real application, you would handle the OAuth process here
             setTimeout(() => {
                 // Redirect to home page after successful login
                 window.location.href = 'index.html';
             }, 1500);
+        });
+        
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('currentUser');
+            showStatus('Logged out successfully!', 'success');
+            checkLoggedIn();
+            
+            // Clear form fields
+            document.getElementById('darpanId').value = '';
+            document.getElementById('gmailId').value = '';
+            document.getElementById('isNgo').checked = false;
         });
         
         // Register link
@@ -595,6 +673,11 @@
                 statusDiv.remove();
             }, 5000);
         }
+        
+        // Check if user is logged in when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoggedIn();
+        });
     </script>
 </body>
 </html>
