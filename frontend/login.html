@@ -326,34 +326,61 @@
         });
         
         // Form submission
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
             event.preventDefault();
             const darpanId = document.getElementById('darpanId').value.trim();
             const isNgo = document.getElementById('isNgo').checked;
-            
+
             // Simple validation
             if (!/^[a-zA-Z0-9]{6,}$/.test(darpanId)) {
                 showStatus('Invalid Darpan ID: Must be alphanumeric and at least 6 characters.', 'error');
                 return;
             }
-            
+
+            // Call Darpan ID verification API
+            showStatus('Verifying Darpan ID...', 'success');
+            try {
+                const response = await fetch('https://kyc-api.surepass.app/api/v1/darpan/darpan-id-verification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer YOUR_API_KEY' // <-- Replace YOUR_API_KEY with your actual Surepass API key
+                    },
+                    body: JSON.stringify({ darpan_id: darpanId })
+                });
+                const result = await response.json();
+                // Surepass API returns { success: true, data: {...} } on valid, { success: false, message: ... } on invalid
+                if (!response.ok) {
+                    showStatus('Darpan ID verification failed: Server error.', 'error');
+                    return;
+                }
+                if (!result.success) {
+                    showStatus('Darpan ID verification failed: ' + (result.message || 'Invalid Darpan ID.'), 'error');
+                    return;
+                }
+                // Optionally, you can use result.data for further info
+            } catch (err) {
+                showStatus('Error verifying Darpan ID. Please try again later.', 'error');
+                return;
+            }
+
             // Save user to localStorage
             const userId = isNgo ? 'NGO_' + darpanId : darpanId;
             localStorage.setItem('currentUser', userId);
-            
+
             // Initialize user data if it doesn't exist
             let users = JSON.parse(localStorage.getItem('users')) || {};
             if (!users[userId]) {
                 users[userId] = { points: 0, level: 1 };
                 localStorage.setItem('users', JSON.stringify(users));
             }
-            
+
             // Show success message
             showStatus('Login successful! Redirecting...', 'success');
-            
+
             // Update UI
             checkLoggedIn();
-            
+
             // Redirect to home page after successful login
             setTimeout(() => {
                 window.location.href = 'index.html';
