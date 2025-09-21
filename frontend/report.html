@@ -28,62 +28,123 @@
             </nav>
         </div>
     </header>
+
     <main>
-        <section>
+        <div class="page-header">
             <h2>Report a Hazard</h2>
-            <form id="reportForm" onsubmit="submitReport(event)">
-                <div id="darpanSection" style="display: none;">
-                    <div class="form-group">
-                        <label for="darpanId">Your Darpan ID</label>
-                        <input type="text" id="darpanId" readonly>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="type">Hazard Type</label>
-                    <select id="type" required>
-                        <option value="">Select a hazard type</option>
-                        <option value="Physical Hazard">Physical Hazard</option>
-                        <option value="Biological Hazard">Biological Hazard</option>
-                        <option value="Chemical Hazard">Chemical Hazard</option>
-                        <option value="Ergonomic Hazard">Ergonomic Hazard</option>
-                        <option value="Electrical Hazard">Electrical Hazard</option>
-                        <option value="Safety Hazard">Safety Hazard</option>
-                        <option value="Earthquake">Earthquake</option>
-                        <option value="Flood">Flood</option>
-                        <option value="Extreme Weather">Extreme Weather</option>
-                        <option value="Sinkhole">Sinkhole</option>
-                        <option value="Others">Others</option>
-                    </select>
-                </div>
+            <p>Help keep your community safe by reporting environmental and safety hazards</p>
+        </div>
+
+        <div class="report-container">
+            <form id="reportForm">
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea id="description" rows="4" required></textarea>
+                    <textarea id="description" placeholder="Provide a detailed description of the hazard" required></textarea>
                 </div>
-                <div class="form-group location-group">
-                    <label>Location</label>
-                    <div class="location-inputs">
-                        <div>
-                            <label for="lat">Latitude</label>
-                            <input type="number" id="lat" step="any" required>
-                        </div>
-                        <div>
-                            <label for="lng">Longitude</label>
-                            <input type="number" id="lng" step="any" required>
+
+                <div class="form-group">
+                    <label for="type">Hazard Type</label>
+                    <div class="hazard-select-container">
+                        <select id="type" required>
+                            <option value="" disabled selected>Select a hazard type</option>
+                            
+                            <optgroup label="🌪️ Natural Hazards">
+                                <option value="Earthquakes">Earthquakes</option>
+                                <option value="Tsunamis">Tsunamis</option>
+                                <option value="Volcanic eruptions">Volcanic eruptions</option>
+                                <option value="Landslides & rockfalls">Landslides & rockfalls</option>
+                                <option value="Floods">Floods (river floods, flash floods, urban floods)</option>
+                                <option value="Cyclones">Cyclones / Hurricanes / Typhoons</option>
+                                <option value="Droughts">Droughts</option>
+                                <option value="Heatwaves & cold waves">Heatwaves & cold waves</option>
+                                <option value="Wildfires">Wildfires / Forest fires</option>
+                                <option value="Avalanches">Avalanches</option>
+                                <option value="Extreme storms">Extreme storms (hailstorms, thunderstorms, lightning strikes)</option>
+                            </optgroup>
+                            
+                            <optgroup label="🏭 Technological & Industrial Hazards">
+                                <option value="Nuclear accidents">Nuclear/radiation accidents</option>
+                                <option value="Industrial disasters">Industrial/chemical disasters (e.g., gas leaks, explosions)</option>
+                                <option value="Structural collapse">Structural collapse (dams, bridges, buildings)</option>
+                                <option value="Power failures">Power failures & electrical hazards</option>
+                                <option value="Transportation accidents">Transportation accidents (road, rail, air, maritime crashes)</option>
+                                <option value="Oil spills">Oil spills & tanker accidents</option>
+                                <option value="Mining accidents">Mining accidents (explosions, cave-ins, toxic leaks)</option>
+                            </optgroup>
+                            
+                            <optgroup label="🌱 Environmental / Ecological Hazards">
+                                <option value="Air pollution">Air pollution (smog, toxic emissions)</option>
+                                <option value="Water pollution">Water pollution (contamination, algal blooms, chemical spills)</option>
+                                <option value="Soil degradation">Soil degradation & contamination (pesticides, heavy metals)</option>
+                                <option value="Deforestation">Deforestation & desertification</option>
+                                <option value="Biodiversity loss">Biodiversity loss & habitat destruction</option>
+                                <option value="Climate change impacts">Climate change impacts (sea level rise, glacier melt, extreme weather)</option>
+                            </optgroup>
+                            
+                            <optgroup label="🧍 Health & Biological Hazards">
+                                <option value="Epidemics">Epidemics (cholera, malaria, dengue, etc.)</option>
+                                <option value="Pandemics">Pandemics (COVID-19, influenza)</option>
+                                <option value="Food insecurity">Food insecurity & malnutrition</option>
+                                <option value="Zoonotic diseases">Zoonotic diseases (animal-to-human diseases like bird flu, rabies)</option>
+                            </optgroup>
+                            
+                            <optgroup label="🏢 Social & Human-Induced Hazards">
+                                <option value="Terrorism">Terrorism & armed conflicts</option>
+                                <option value="Riots">Riots & civil unrest</option>
+                                <option value="Refugee crises">Refugee crises / mass displacement</option>
+                                <option value="Cyber hazards">Cyber hazards (data breaches, infrastructure hacking)</option>
+                                <option value="Urban crowding">Urban crowding / slum conditions</option>
+                            </optgroup>
+                            
+                            <optgroup label="⚒️ Occupational Hazards">
+                                <option value="Workplace accidents">Workplace accidents (falls, machinery accidents)</option>
+                                <option value="Chemical exposure">Chemical exposure (pesticides, solvents, asbestos)</option>
+                                <option value="Physical hazards">Physical hazards (noise, vibration, extreme temperatures)</option>
+                                <option value="Ergonomic hazards">Ergonomic hazards (repetitive strain, poor posture)</option>
+                                <option value="Biological exposure">Biological exposure (healthcare workers, lab workers at risk)</option>
+                            </optgroup>
+                        </select>
+                        <div class="hazard-tooltip" id="hazardTooltip">
+                            <div class="tooltip-header">
+                                <strong>Priority: <span id="tooltipPriority" class="tooltip-priority"></span></strong>
+                            </div>
+                            <div class="tooltip-description" id="tooltipDescription"></div>
                         </div>
                     </div>
-                    <button type="button" class="get-location" onclick="getLocation()">
-                        <i class="fas fa-location-arrow"></i> Use Current Location
-                    </button>
                 </div>
+
                 <div class="form-group">
                     <label for="image">Upload Image (Optional)</label>
                     <input type="file" id="image" accept="image/*">
                 </div>
-                <button type="submit">Submit Report</button>
+
+                <div class="form-group">
+                    <label>Location</label>
+                    <div class="location-group">
+                        <div class="location-inputs">
+                            <div>
+                                <label for="lat">Latitude</label>
+                                <input type="text" id="lat" placeholder="Latitude" required>
+                            </div>
+                            <div>
+                                <label for="lng">Longitude</label>
+                                <input type="text" id="lng" placeholder="Longitude" required>
+                            </div>
+                        </div>
+                        <button type="button" class="get-location" onclick="getLocation()">
+                            <i class="fas fa-location-arrow"></i> Use Current Location
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Report
+                </button>
             </form>
-            <p id="status"></p>
-        </section>
+            <div id="status" class="form-status"></div>
+        </div>
     </main>
+
     <footer>
         <div class="footer-content">
             <p>Thank you! Contact us for more info.</p>
@@ -96,6 +157,210 @@
             <p>&copy; 2023 CivicEye. All rights reserved.</p>
         </div>
     </footer>
-    <script src="script.js"></script>
+
+    <script>
+        // Hazard data with priorities and descriptions
+        const hazardData = {
+            "Earthquakes": { priority: 5, description: "Ground shaking that can cause building collapse and tsunamis" },
+            "Tsunamis": { priority: 5, description: "Large ocean waves caused by underwater earthquakes or volcanic eruptions" },
+            "Volcanic eruptions": { priority: 5, description: "Ejection of lava, ash, and gases from volcanoes" },
+            "Landslides & rockfalls": { priority: 4, description: "Rapid downward movement of soil, rock, and debris" },
+            "Floods": { priority: 4, description: "Overflow of water that submerges normally dry land" },
+            "Cyclones": { priority: 5, description: "Intense circular storms with strong winds and heavy rain" },
+            "Droughts": { priority: 3, description: "Prolonged period of abnormally low rainfall" },
+            "Heatwaves & cold waves": { priority: 3, description: "Extended periods of excessively hot or cold weather" },
+            "Wildfires": { priority: 4, description: "Uncontrolled fires in forests or grasslands" },
+            "Avalanches": { priority: 4, description: "Rapid flow of snow down a slope" },
+            "Extreme storms": { priority: 4, description: "Severe weather events including hailstorms and thunderstorms" },
+            "Nuclear accidents": { priority: 5, description: "Release of radioactive materials from nuclear facilities" },
+            "Industrial disasters": { priority: 5, description: "Accidents at industrial facilities causing widespread damage" },
+            "Structural collapse": { priority: 4, description: "Failure of buildings, bridges, or other structures" },
+            "Power failures": { priority: 3, description: "Loss of electrical power affecting large areas" },
+            "Transportation accidents": { priority: 4, description: "Accidents involving vehicles, aircraft, or vessels" },
+            "Oil spills": { priority: 4, description: "Release of petroleum into the environment" },
+            "Mining accidents": { priority: 4, description: "Accidents in mining operations causing injuries or pollution" },
+            "Air pollution": { priority: 3, description: "Contamination of air by harmful substances" },
+            "Water pollution": { priority: 4, description: "Contamination of water bodies by harmful substances" },
+            "Soil degradation": { priority: 3, description: "Deterioration of soil quality through human activities" },
+            "Deforestation": { priority: 3, description: "Clearing of forests for other land uses" },
+            "Biodiversity loss": { priority: 3, description: "Reduction in variety of plant and animal species" },
+            "Climate change impacts": { priority: 4, description: "Effects of global climate change on environments" },
+            "Epidemics": { priority: 4, description: "Rapid spread of infectious diseases to many people" },
+            "Pandemics": { priority: 5, description: "Worldwide spread of a new infectious disease" },
+            "Food insecurity": { priority: 3, description: "Lack of reliable access to sufficient nutritious food" },
+            "Zoonotic diseases": { priority: 4, description: "Diseases transmitted from animals to humans" },
+            "Terrorism": { priority: 5, description: "Use of violence and intimidation for political purposes" },
+            "Riots": { priority: 4, description: "Violent public disturbances by crowds" },
+            "Refugee crises": { priority: 4, description: "Large-scale displacement of people across borders" },
+            "Cyber hazards": { priority: 4, description: "Threats to computer systems and networks" },
+            "Urban crowding": { priority: 3, description: "Overpopulation in urban areas leading to various issues" },
+            "Workplace accidents": { priority: 3, description: "Accidents occurring in work environments" },
+            "Chemical exposure": { priority: 4, description: "Exposure to harmful chemicals in occupational settings" },
+            "Physical hazards": { priority: 3, description: "Workplace hazards like noise, vibration, extreme temperatures" },
+            "Ergonomic hazards": { priority: 2, description: "Workplace conditions that strain the body" },
+            "Biological exposure": { priority: 4, description: "Exposure to biological agents in occupational settings" }
+        };
+
+        // Priority class mapping
+        const priorityClasses = {
+            5: "priority-critical",
+            4: "priority-high",
+            3: "priority-medium",
+            2: "priority-low"
+        };
+
+        // Get user's current location
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        document.getElementById('lat').value = position.coords.latitude.toFixed(6);
+                        document.getElementById('lng').value = position.coords.longitude.toFixed(6);
+                        showStatus('Location obtained successfully!', 'success');
+                    },
+                    (error) => {
+                        showStatus('Error getting location: ' + error.message, 'error');
+                    }
+                );
+            } else {
+                showStatus('Geolocation is not supported by this browser.', 'error');
+            }
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `form-status ${type}`;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusDiv.textContent = '';
+                statusDiv.className = 'form-status';
+            }, 5000);
+        }
+
+        // Update tooltip when selecting options
+        function setupHazardTooltips() {
+            const select = document.getElementById('type');
+            const tooltip = document.getElementById('hazardTooltip');
+            const tooltipPriority = document.getElementById('tooltipPriority');
+            const tooltipDescription = document.getElementById('tooltipDescription');
+            
+            // Show tooltip when selecting options
+            select.addEventListener('change', (e) => {
+                const hazard = hazardData[e.target.value];
+                if (hazard) {
+                    tooltipPriority.textContent = `Level ${hazard.priority}`;
+                    tooltipPriority.className = `tooltip-priority ${priorityClasses[hazard.priority]}`;
+                    tooltipDescription.textContent = hazard.description;
+                    
+                    // Position the tooltip near the select
+                    const selectRect = select.getBoundingClientRect();
+                    tooltip.style.top = `${selectRect.height + 5}px`;
+                    tooltip.style.opacity = '1';
+                    tooltip.style.visibility = 'visible';
+                }
+            });
+            
+            // Hide tooltip when leaving the select
+            select.addEventListener('mouseleave', () => {
+                tooltip.style.opacity = '0';
+                tooltip.style.visibility = 'hidden';
+            });
+        }
+
+        // Form submission
+        document.getElementById('reportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) {
+                showStatus('Please log in to submit a report.', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+                return;
+            }
+            
+            const description = document.getElementById('description').value;
+            const type = document.getElementById('type').value;
+            const lat = document.getElementById('lat').value;
+            const lng = document.getElementById('lng').value;
+            const imageFile = document.getElementById('image').files[0];
+            
+            // Simple validation
+            if (!description || !type || !lat || !lng) {
+                showStatus('Please fill all required fields.', 'error');
+                return;
+            }
+            
+            if (description.length < 10) {
+                showStatus('Description must be at least 10 characters long.', 'error');
+                return;
+            }
+            
+            // Create hazard object
+            const hazard = {
+                id: Date.now(),
+                reporter: currentUser,
+                description,
+                type,
+                lat: parseFloat(lat),
+                lng: parseFloat(lng),
+                image: null,
+                status: 'pending',
+                validation_status: 'pending',
+                votes: { true: 0, false: 0 },
+                resolvedBy: null,
+                solutions: [],
+                validatedBy: {}
+            };
+            
+            // Handle image if provided
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    hazard.image = e.target.result;
+                    saveHazard(hazard);
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                saveHazard(hazard);
+            }
+        });
+        
+        // Save hazard to localStorage
+        function saveHazard(hazard) {
+            let hazards = JSON.parse(localStorage.getItem('hazards')) || [];
+            hazards.push(hazard);
+            localStorage.setItem('hazards', JSON.stringify(hazards));
+            
+            showStatus('Report submitted successfully! It will appear in Validate Hazards for review.', 'success');
+            document.getElementById('reportForm').reset();
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up hazard tooltips
+            setupHazardTooltips();
+            
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const mainNav = document.getElementById('main-nav');
+            
+            if (mobileMenuBtn && mainNav) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mainNav.classList.toggle('active');
+                });
+            }
+            
+            // Check if user is logged in
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) {
+                showStatus('Please log in to submit a report.', 'info');
+            }
+        });
+    </script>
 </body>
 </html>
