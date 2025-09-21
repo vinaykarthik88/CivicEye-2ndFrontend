@@ -401,4 +401,27 @@ function loginWithGmail() {
     } else {
         document.getElementById('loginStatus').textContent = 'Invalid Gmail ID. Please use a valid Gmail address.';
     }
-}   
+}
+
+// Mobile menu functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const mainNav = document.getElementById('main-nav');
+    
+    if (mobileMenuBtn && mainNav) {
+        mobileMenuBtn.addEventListener('click', function() {
+            mainNav.classList.toggle('active');
+        });
+    }
+    
+    // Set active navigation link based on current page
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const navLinks = document.querySelectorAll('nav a');
+    
+    navLinks.forEach(link => {
+        const linkPage = link.getAttribute('href');
+        if (linkPage === currentPage) {
+            link.classList.add('active');
+        }
+    });
+});

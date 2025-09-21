@@ -4,49 +4,552 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CivicEye - Login</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c6e49;
+            --primary-light: #4c956c;
+            --secondary: #1b4332;
+            --accent: #fca311;
+            --light: #fefee3;
+            --dark: #1d3557;
+            --gray: #6c757d;
+            --light-gray: #f8f9fa;
+            --danger: #e63946;
+            --success: #2a9d8f;
+            --warning: #f4a261;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light-gray);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: url('https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .logo i {
+            color: var(--accent);
+        }
+
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        nav a.active {
+            background-color: var(--accent);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent);
+            border-radius: 50%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 400px;
+            transition: var(--transition);
+        }
+
+        .login-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .login-icon {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .login-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44, 110, 73, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .checkbox-group input {
+            width: auto;
+        }
+
+        .help-text {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 0.5rem;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: var(--secondary);
+        }
+
+        .gmail-btn {
+            background-color: #DB4437;
+        }
+
+        .gmail-btn:hover {
+            background-color: #c03d2e;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+            color: var(--gray);
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: #ddd;
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        .login-status {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .success {
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border: 1px solid #badbcc;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #842029;
+            border: 1px solid #f5c2c7;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav {
+                flex-direction: column;
+                width: 100%;
+                display: none;
+            }
+            
+            nav.active {
+                display: flex;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+                position: absolute;
+                right: 2rem;
+                top: 1.5rem;
+            }
+            
+            .login-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .login-box {
+                max-width: 100%;
+            }
+        }
+    </style>
 </head>
-<body>
+<body id="login">
     <header>
-        <h1>CivicEye</h1>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="report.html">Report Hazard</a>
-            <a href="view.html">View Hazards</a>
-            <a href="validate.html">Validate Hazards</a>
-            <a href="leaderboard.html">Leaderboard</a>
-            <a href="login.html">Login</a>
-        </nav>
-    </header>
-    <main>
-        <section>
-            <h2>Login</h2>
-            <div class="login-container">
-                <form id="loginForm">
-                    <label for="darpanId">Darpan ID:</label>
-                    <input type="text" id="darpanId" placeholder="Enter Darpan ID" required>
-                    <label>
-                        <input type="checkbox" id="isNgo"> NGO Login (Verify at <a href="https://ngodarpan.gov.in" target="_blank">ngodarpan.gov.in</a>)
-                    </label>
-                    <small id="loginHelp">Alphanumeric, min 6 chars. NGOs: Check box for prefix.</small>
-                    <button type="submit">Login with Darpan ID</button>
-                </form>
-                <div class="gmail-login">
-                    <button id="gmailLogin">Login with Gmail</button>
-                </div>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-eye"></i>
+                <span>CivicEye</span>
             </div>
-            <p id="loginStatus"></p>
-            <p><button onclick="logout()">Logout</button></p>
-        </section>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav id="main-nav">
+                <a href="index.html">Home</a>
+                <a href="report.html">Report Hazard</a>
+                <a href="view.html">View Hazards</a>
+                <a href="validate.html">Validate Hazards</a>
+                <a href="leaderboard.html">Leaderboard</a>
+                <a href="login.html" class="active">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="login-container">
+            <!-- Darpan ID Login Box -->
+            <div class="login-box">
+                <div class="login-header">
+                    <div class="login-icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <h2 class="login-title">Darpan ID Login</h2>
+                    <p class="login-subtitle">Use your Darpan ID to access CivicEye</p>
+                </div>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="darpanId">Darpan ID</label>
+                        <input type="text" id="darpanId" placeholder="Enter your Darpan ID" required>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="isNgo">
+                        <label for="isNgo">NGO Login</label>
+                    </div>
+                    
+                    <p class="help-text" id="loginHelp">Alphanumeric, min 6 chars. NGOs: Check box for prefix.</p>
+                    
+                    <button type="submit">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login with Darpan ID
+                    </button>
+                </form>
+                
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+                
+                <p class="help-text">Verify your Darpan ID at <a href="https://ngodarpan.gov.in" target="_blank">ngodarpan.gov.in</a></p>
+            </div>
+            
+            <!-- Gmail Login Box -->
+            <div class="login-box">
+                <div class="login-header">
+                    <div class="login-icon">
+                        <i class="fab fa-google"></i>
+                    </div>
+                    <h2 class="login-title">Gmail Login</h2>
+                    <p class="login-subtitle">Use your Gmail account to access CivicEye</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="gmailId">Gmail Address</label>
+                    <input type="email" id="gmailId" placeholder="Enter your Gmail address" required>
+                </div>
+                
+                <button class="gmail-btn" id="gmailLogin">
+                    <i class="fab fa-google"></i>
+                    Login with Gmail
+                </button>
+                
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+                
+                <p class="help-text">Don't have an account? <a href="#" id="registerLink">Register here</a></p>
+            </div>
+        </div>
     </main>
+
     <footer>
-        <p>Thank you! Contact us for more info.</p>
+        <div class="footer-content">
+            <p>Thank you! Contact us for more info.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+            <p>&copy; 2023 CivicEye. All rights reserved.</p>
+        </div>
     </footer>
-    <script src="script.js"></script>
+
     <script>
-        document.getElementById('loginForm').addEventListener('submit', login);
-        document.getElementById('isNgo').addEventListener('change', toggleLoginHelp);
-        document.getElementById('gmailLogin').addEventListener('click', loginWithGmail);
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+            document.getElementById('main-nav').classList.toggle('active');
+        });
+        
+        // Toggle login help text
+        document.getElementById('isNgo').addEventListener('change', function(event) {
+            const help = document.getElementById('loginHelp');
+            if (event.target.checked) {
+                help.textContent = 'NGO mode enabled. Verify your Darpan ID at ngodarpan.gov.in.';
+            } else {
+                help.textContent = 'Alphanumeric, min 6 chars. NGOs: Check box for prefix.';
+            }
+        });
+        
+        // Form submission
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const darpanId = document.getElementById('darpanId').value.trim();
+            const isNgo = document.getElementById('isNgo').checked;
+            
+            // Simple validation
+            if (!/^[a-zA-Z0-9]{6,}$/.test(darpanId)) {
+                showStatus('Invalid Darpan ID: Must be alphanumeric and at least 6 characters.', 'error');
+                return;
+            }
+            
+            // Simulate successful login
+            showStatus('Login successful! Redirecting...', 'success');
+            
+            // In a real application, you would handle the login process here
+            setTimeout(() => {
+                // Redirect to home page after successful login
+                window.location.href = 'index.html';
+            }, 1500);
+        });
+        
+        // Gmail login
+        document.getElementById('gmailLogin').addEventListener('click', function() {
+            const gmailId = document.getElementById('gmailId').value.trim();
+            
+            // Simple validation
+            if (!gmailId || !gmailId.includes('@gmail.com')) {
+                showStatus('Please enter a valid Gmail address.', 'error');
+                return;
+            }
+            
+            // Simulate successful login
+            showStatus('Login with Gmail successful! Redirecting...', 'success');
+            
+            // In a real application, you would handle the OAuth process here
+            setTimeout(() => {
+                // Redirect to home page after successful login
+                window.location.href = 'index.html';
+            }, 1500);
+        });
+        
+        // Register link
+        document.getElementById('registerLink').addEventListener('click', function(event) {
+            event.preventDefault();
+            showStatus('Registration feature coming soon!', 'success');
+        });
+        
+        // Show status message
+        function showStatus(message, type) {
+            // Remove any existing status message
+            const existingStatus = document.querySelector('.login-status');
+            if (existingStatus) {
+                existingStatus.remove();
+            }
+            
+            // Create new status message
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `login-status ${type}`;
+            statusDiv.textContent = message;
+            
+            // Insert after the login form
+            document.querySelector('.login-box:first-child').appendChild(statusDiv);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                statusDiv.remove();
+            }, 5000);
+        }
     </script>
 </body>
 </html>
