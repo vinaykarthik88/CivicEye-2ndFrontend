@@ -148,6 +148,7 @@
             justify-content: center;
             width: 100%;
             max-width: 900px;
+            perspective: 1000px;
         }
 
         .login-box {
@@ -157,12 +158,38 @@
             box-shadow: var(--shadow);
             width: 100%;
             max-width: 400px;
-            transition: var(--transition);
+            transition: all 0.5s ease;
+            transform-style: preserve-3d;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-box.darpan-box {
+            transform: translateZ(0);
+            filter: blur(0);
+        }
+
+        .login-box.gmail-box {
+            transform: translateZ(0);
+            filter: blur(0);
+        }
+
+        .login-container:hover .darpan-box:not(:hover) {
+            transform: translateZ(-10px);
+            filter: blur(2px);
+            opacity: 0.8;
+        }
+
+        .login-container:hover .gmail-box:not(:hover) {
+            transform: translateZ(-10px);
+            filter: blur(2px);
+            opacity: 0.8;
         }
 
         .login-box:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            transform: translateZ(20px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            z-index: 2;
         }
 
         .login-header {
@@ -174,6 +201,12 @@
             font-size: 2.5rem;
             color: var(--primary);
             margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        .login-box:hover .login-icon {
+            transform: scale(1.1);
+            color: var(--accent);
         }
 
         .login-title {
@@ -361,6 +394,18 @@
             .login-box {
                 max-width: 100%;
             }
+            
+            /* Disable 3D effects on mobile */
+            .login-container:hover .darpan-box:not(:hover),
+            .login-container:hover .gmail-box:not(:hover) {
+                transform: translateZ(0);
+                filter: blur(0);
+                opacity: 1;
+            }
+            
+            .login-box:hover {
+                transform: scale(1.01);
+            }
         }
     </style>
 </head>
@@ -388,7 +433,7 @@
     <main>
         <div class="login-container">
             <!-- Darpan ID Login Box -->
-            <div class="login-box">
+            <div class="login-box darpan-box">
                 <div class="login-header">
                     <div class="login-icon">
                         <i class="fas fa-id-card"></i>
@@ -424,7 +469,7 @@
             </div>
             
             <!-- Gmail Login Box -->
-            <div class="login-box">
+            <div class="login-box gmail-box">
                 <div class="login-header">
                     <div class="login-icon">
                         <i class="fab fa-google"></i>
