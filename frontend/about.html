@@ -4,8 +4,178 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CivicEye - About</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+        }
+
+        /* Header Styles */
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        #main-nav {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        #main-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        #main-nav a:hover,
+        #main-nav a.active {
+            background: #3498db;
+        }
+
+        /* Main Content */
+        main {
+            margin-top: 80px;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        section {
+            background: white;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .social-links {
+            margin: 1rem 0;
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            margin: 0 1rem;
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: #3498db;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            #main-nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: #2c3e50;
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            #main-nav.active {
+                display: flex;
+            }
+
+            #main-nav a {
+                padding: 1rem;
+                text-align: center;
+            }
+
+            main {
+                padding: 20px 10px;
+            }
+
+            section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body id="about">
     <header>
@@ -14,7 +184,7 @@
                 <i class="fas fa-eye"></i>
                 <span>CivicEye</span>
             </div>
-            <button class="mobile-menu-btn">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
                 <i class="fas fa-bars"></i>
             </button>
             <nav id="main-nav">
@@ -28,28 +198,34 @@
             </nav>
         </div>
     </header>
+
     <main>
         <section>
             <h2>Background</h2>
-            <p>Environmental hazards (air/water pollution, waste dumps) are often unreported due to lack of structured mechanisms.</p>
-            <h2>Expected Solution</h2>
-            <p>Build a platform for reporting with images/geotags, collaborative validation, and open-source remediation plans.</p>
-            <h2>Impact</h2>
-            <p>Empower citizens and NGOs to document and resolve environmental issues, with gamification for engagement.</p>
+            <p>Environmental hazards such as air and water pollution, illegal waste dumps, and other environmental threats often go unreported due to the lack of accessible and structured reporting mechanisms. This creates a significant gap between citizens who witness these issues and the authorities or organizations that can take action.</p>
+            
+            <p>Traditional reporting channels are often bureaucratic, time-consuming, or inaccessible to the general public, leaving many environmental issues unaddressed and allowing them to worsen over time.</p>
         </section>
-    </main>
-    <footer>
-        <div class="footer-content">
-            <p>Thank you! Contact us for more info.</p>
-            <div class="social-links">
-                <a href="#"><i class="fab fa-facebook"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-linkedin"></i></a>
-            </div>
-            <p>&copy; 2023 CivicEye. All rights reserved.</p>
-        </div>
-    </footer>
-    <script src="script.js"></script>
-</body>
-</html>
+
+        <section>
+            <h2>Expected Solution</h2>
+            <p>CivicEye aims to bridge this gap by providing a comprehensive platform that empowers citizens to report environmental hazards easily and effectively. Our solution includes:</p>
+            
+            <ul style="margin-left: 2rem; margin-top: 1rem;">
+                <li><strong>Easy Reporting:</strong> Simple interface for uploading photos and videos of environmental hazards with automatic geotagging</li>
+                <li><strong>Collaborative Validation:</strong> Community verification system where multiple users can confirm reported issues</li>
+                <li><strong>Open-Source Remediation:</strong> Crowdsourced solutions and action plans that can be implemented by local communities and authorities</li>
+                <li><strong>Real-time Tracking:</strong> Live updates on the status of reported issues and their resolution progress</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Impact</h2>
+            <p>By combining citizen engagement with technological solutions, CivicEye creates a powerful ecosystem for environmental stewardship:</p>
+            
+            <ul style="margin-left: 2rem; margin-top: 1rem;">
+                <li><strong>Empowered Citizens:</strong> Regular people become active participants in environmental protection</li>
+                <li><strong>Enhanced NGO Efficiency:</strong> Organizations receive verified, geotagged reports with visual evidence</li>
+                <li><strong>Government Accountability:</strong> Transparent tracking of reported issues and their resolution</li>
+                <li><strong>Gamification:</strong> Reward systems and leaderboards to encourage sustained participation</li>
+                <li><strong>Community Building:</strong> Local action groups form around persistent environmental issues</li
