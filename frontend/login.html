@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicEye - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>CivicEye</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="report.html">Report Hazard</a>
+            <a href="view.html">View Hazards</a>
+            <a href="validate.html">Validate Hazards</a>
+            <a href="leaderboard.html">Leaderboard</a>
+            <a href="login.html">Login</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Login</h2>
+            <form id="loginForm">
+                <label for="darpanId">Darpan ID:</label>
+                <input type="text" id="darpanId" placeholder="Enter Darpan ID" required>
+                <label>
+                    <input type="checkbox" id="isNgo"> NGO Login (Verify at <a href="https://ngodarpan.gov.in" target="_blank">ngodarpan.gov.in</a>)
+                </label>
+                <small id="loginHelp">Alphanumeric, min 6 chars. NGOs: Check box for prefix.</small>
+                <button type="submit">Login</button>
+            </form>
+            <p id="loginStatus"></p>
+            <p><button onclick="logout()">Logout</button></p>
+        </section>
+    </main>
+    <footer>
+        <p>Thank you! Contact us for more info.</p>
+    </footer>
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', login);
+        document.getElementById('isNgo').addEventListener('change', toggleLoginHelp);
+    </script>
+</body>
+</html>

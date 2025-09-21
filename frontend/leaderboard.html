@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicEye - Leaderboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>CivicEye</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="report.html">Report Hazard</a>
+            <a href="view.html">View Hazards</a>
+            <a href="validate.html">Validate Hazards</a>
+            <a href="leaderboard.html">Leaderboard</a>
+            <a href="login.html">Login</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Leaderboard</h2>
+            <p>Users and NGOs ranked by points. Level up every 10 points!</p>
+            <table id="leaderboardTable">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>User <span class="sort-arrow" onclick="sortTable('user')">↑↓</span></th>
+                        <th>Points <span class="sort-arrow" onclick="sortTable('points')">↑↓</span></th>
+                        <th>Level</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboardBody"></tbody>
+            </table>
+            <div id="pagination">
+                <button onclick="prevPage()">← Previous</button>
+                <span id="pageInfo"></span>
+                <button onclick="nextPage()">Next →</button>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>Thank you! Contact us for more info.</p>
+    </footer>
+    <script src="script.js"></script>
+    <script>
+        loadLeaderboard();
+    </script>
+</body>
+</html>

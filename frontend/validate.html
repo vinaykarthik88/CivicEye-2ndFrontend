@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicEye - Validate Hazards</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>CivicEye</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="report.html">Report Hazard</a>
+            <a href="view.html">View Hazards</a>
+            <a href="validate.html">Validate Hazards</a>
+            <a href="leaderboard.html">Leaderboard</a>
+            <a href="login.html">Login</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Validate Pending Hazards</h2>
+            <p>Review and vote on whether reports are valid (true) or invalid/spam (false). Login with your Darpan ID to vote and suggest a solution. Earn points for contributions!</p>
+            <div id="darpanSection" style="display: none;">
+                <label for="darpanId">Logged in as Darpan ID:</label>
+                <input type="text" id="darpanId" readonly>
+            </div>
+            <ul id="pendingList"></ul>
+        </section>
+    </main>
+    <footer>
+        <p>Thank you! Contact us for more info.</p>
+    </footer>
+    <script src="script.js"></script>
+    <script>
+        loadDarpanForForm('validateForm');
+        loadPendingHazards();
+    </script>
+</body>
+</html>
